@@ -15,6 +15,11 @@ public class CursorUtils {
 	public static Long extractLongOrNull(Cursor c, String columnName) {
 		int columnIndex = c.getColumnIndex(columnName);
 		return c.isNull(columnIndex) ? null : c.getLong(columnIndex);
+	}
+	
+	public static Integer extractIntOrNull(Cursor c, String columnName) {
+		int columnIndex = c.getColumnIndex(columnName);
+		return c.isNull(columnIndex) ? null : c.getInt(columnIndex);
 	}	
 
 	public static Double extractDoubleOrNull(Cursor c, String columnName) {
