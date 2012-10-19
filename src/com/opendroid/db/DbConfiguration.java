@@ -10,6 +10,8 @@ public class DbConfiguration {
 
 	/** The table name. */
 	final private String databaseName;
+	
+	final private String databasePath;
 
 	/** The models. */
 	final private List<DbModel> models;
@@ -17,6 +19,10 @@ public class DbConfiguration {
 	
 	public String getDatabaseName() {
 		return databaseName;
+	}
+	
+	public String getDatabasePath() {
+		return databasePath;
 	}
 
 
@@ -31,6 +37,7 @@ public class DbConfiguration {
 	private DbConfiguration(final Builder builder) {
 		this.databaseName = builder.databaseName;
 		this.models = builder.models;
+		this.databasePath = builder.databasePath;
 	}
 	
 	
@@ -45,6 +52,8 @@ public class DbConfiguration {
 		/** The models. */
 		private List<DbModel> models;
 
+		private String databasePath;
+
 		/**
 		 * Sets the table name.
 		 *
@@ -52,6 +61,16 @@ public class DbConfiguration {
 		 */
 		public Builder setDatabaseName(String databaseName) {
 			this.databaseName = databaseName;
+			return this;
+		}
+		
+		/**
+		 * Sets the table name.
+		 *
+		 * @param tableName the new table name
+		 */
+		public Builder setDatabasePath(String databasePath) {
+			this.databasePath = databasePath;
 			return this;
 		}
 

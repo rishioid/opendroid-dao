@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-
 /**
  * DBHelper v2.0 helper class for database CRUD operation on sqlite database
  * 
@@ -26,7 +25,8 @@ public class DbHelper {
 	private SQLiteDatabase db;
 	private SQLiteStatement insertStmt;
 	private static OpenHelper openHelper;
-	
+	private String databasePath = null;
+
 	private static DbHelper dbHelper = null;
 
 	private DbHelper(Context context) {
@@ -37,38 +37,38 @@ public class DbHelper {
 			db.close();
 			openHelper.close();
 		}
-		db = openHelper.getWritableDatabase();
+		if (databasePath == null) {
+			db = openHelper.getWritableDatabase();
+		} else {
+			db = SQLiteDatabase.openDatabase(databasePath, null,
+					SQLiteDatabase.OPEN_READWRITE);
+
+		}
 
 	}
-	
-	public void init(DbConfiguration dbConfiguration)
-	{
+
+	public void init(DbConfiguration dbConfiguration) {
 		DATABASE_NAME = dbConfiguration.getDatabaseName();
 		models = dbConfiguration.getModels();
+		databasePath = dbConfiguration.getDatabasePath();
 	}
-	
-	public static DbHelper getInstance(Context context)
-	{
-		if(dbHelper ==  null)
-		{
+
+	public static DbHelper getInstance(Context context) {
+		if (dbHelper == null) {
 			dbHelper = new DbHelper(context);
 		}
-		
+
 		return dbHelper;
 	}
 
-	/*public DbHelper(Context context,List<DbModel> models) {
-		this.context = context;
-		this.models = models;
-		openHelper = new OpenHelper(this.context);
-		openHelper.close();
-		if (db != null && db.isOpen()) {
-			db.close();
-			openHelper.close();
-		}
-		db = openHelper.getWritableDatabase();
-
-	}*/
+	/*
+	 * public DbHelper(Context context,List<DbModel> models) { this.context =
+	 * context; this.models = models; openHelper = new OpenHelper(this.context);
+	 * openHelper.close(); if (db != null && db.isOpen()) { db.close();
+	 * openHelper.close(); } db = openHelper.getWritableDatabase();
+	 * 
+	 * }
+	 */
 
 	public void close() {
 		if (db != null) {
@@ -296,8 +296,7 @@ public class DbHelper {
 					db.execSQL("CREATE TABLE IF NOT EXISTS "
 							+ query.getCreateStatement());
 
-					Log.i(TAG,
-							"created table " + query.getTableName());
+					Log.i(TAG, "created table " + query.getTableName());
 				}
 			}
 		}
