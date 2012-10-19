@@ -7,6 +7,8 @@ import java.util.List;
  * The Class DbConfiguration.
  */
 public class DbConfiguration {
+	
+	static DbConfiguration dbConf;
 
 	/** The table name. */
 	final private String databaseName;
@@ -29,8 +31,7 @@ public class DbConfiguration {
 	public List<DbModel> getModels() {
 		return models;
 	}
-
-
+	
 	/**
 	 * Instantiates a new db configuration.
 	 */
@@ -45,6 +46,11 @@ public class DbConfiguration {
 	 * Builder pattern for setting all configurations
 	 */
 	public static class Builder {
+		
+		public Builder()
+		{
+			
+		}
 		
 		/** The table name. */
 		private String databaseName;

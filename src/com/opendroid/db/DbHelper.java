@@ -40,7 +40,7 @@ public class DbHelper {
 		if (databasePath == null) {
 			db = openHelper.getWritableDatabase();
 		} else {
-			db = SQLiteDatabase.openDatabase(databasePath, null,
+			db = SQLiteDatabase.openDatabase(databasePath+DATABASE_NAME, null,
 					SQLiteDatabase.OPEN_READWRITE);
 
 		}
