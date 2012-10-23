@@ -11,49 +11,97 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+// TODO: Auto-generated Javadoc
 /**
- * DBHelper v2.0 helper class for database CRUD operation on sqlite database
+ * DBHelper v3.0 helper class for database CRUD operation on sqlite database
  * 
  * @author Rishi K
  * 
  */
 public class DbHelper {
-	private String DATABASE_NAME;
+	
+	/** The database name. */
+	private static String DATABASE_NAME;
+	
+	/** The Constant DATABASE_VERSION. */
 	private final static int DATABASE_VERSION = 1;
-	private List<DbModel> models;
+	
+	/** The Constant TAG. */
+	private static final String TAG = "DbHelper";
+	
+	/** The models. */
+	private static List<DbModel> models;
+	
+	/** The context. */
 	private Context context;
+	
+	/** The db. */
 	private SQLiteDatabase db;
+	
+	/** The insert stmt. */
 	private SQLiteStatement insertStmt;
+	
+	/** The open helper. */
 	private static OpenHelper openHelper;
-	private String databasePath = null;
+	
+	/** The database path. */
+	private static String databasePath = null;
 
+	/** The db helper. */
 	private static DbHelper dbHelper = null;
 
+	/**
+	 * Instantiates a new db helper.
+	 *
+	 * @param context the context
+	 */
 	private DbHelper(Context context) {
 		this.context = context;
-		openHelper = new OpenHelper(this.context);
-		openHelper.close();
-		if (db != null && db.isOpen()) {
-			db.close();
-			openHelper.close();
-		}
-		if (databasePath == null) {
-			db = openHelper.getWritableDatabase();
+		if (this.DATABASE_NAME == null || this.models == null) {
+			Log.d(TAG, "Initialized an empty helper.");
 		} else {
-			db = SQLiteDatabase.openDatabase(databasePath+DATABASE_NAME, null,
-					SQLiteDatabase.OPEN_READWRITE);
+			openHelper = new OpenHelper(this.context);
+			openHelper.close();
+			if (db != null && db.isOpen()) {
+				db.close();
+				openHelper.close();
+			}
+			if (databasePath == null) {
+				db = openHelper.getWritableDatabase();
+			} else {
+				db = SQLiteDatabase.openDatabase(databasePath + DATABASE_NAME,
+						null, SQLiteDatabase.OPEN_READWRITE);
 
+			}
 		}
 
 	}
 
-	public void init(DbConfiguration dbConfiguration) {
+
+	/**
+	 * Inits a new databasehelper instance, need to be done just once while startup of application
+	 *
+	 * @param context the context
+	 * @param dbConfiguration the database configuration
+	 * @return the DbHelper instance
+	 */
+	public synchronized static DbHelper init(Context context,
+			DbConfiguration dbConfiguration) {
 		DATABASE_NAME = dbConfiguration.getDatabaseName();
 		models = dbConfiguration.getModels();
 		databasePath = dbConfiguration.getDatabasePath();
+
+		return new DbHelper(context);
 	}
 
+	/**
+	 * Gets the single instance of DbHelper.
+	 *
+	 * @param context the context
+	 * @return single instance of DbHelper
+	 */
 	public static DbHelper getInstance(Context context) {
+
 		if (dbHelper == null) {
 			dbHelper = new DbHelper(context);
 		}
@@ -61,32 +109,39 @@ public class DbHelper {
 		return dbHelper;
 	}
 
-	/*
-	 * public DbHelper(Context context,List<DbModel> models) { this.context =
-	 * context; this.models = models; openHelper = new OpenHelper(this.context);
-	 * openHelper.close(); if (db != null && db.isOpen()) { db.close();
-	 * openHelper.close(); } db = openHelper.getWritableDatabase();
-	 * 
-	 * }
+	/**
+	 * Close.
 	 */
-
 	public void close() {
 		if (db != null) {
 			db.close();
 		}
 	}
 
+	/**
+	 * Gets the SQLite database instance.
+	 *
+	 * @return the SQLite database instance
+	 */
 	public SQLiteDatabase getSQLiteDatabase() {
+		if(db!=null && !db.isOpen())
+		{
+			if (databasePath == null) {
+				db = openHelper.getWritableDatabase();
+			} else {
+				db = SQLiteDatabase.openDatabase(databasePath + DATABASE_NAME,
+						null, SQLiteDatabase.OPEN_READWRITE);
+
+			}
+		}
 		return db;
 	}
 
 	/**
-	 * Method to insert values to database
-	 * 
-	 * @param query
-	 *            = string query as per JDBC prepared statement
-	 * @param values
-	 *            = values substituted for ? in query specified
+	 * Method to insert values to database.
+	 *
+	 * @param query = string query as per JDBC prepared statement
+	 * @param values = values substituted for ? in query specified
 	 * @return returns true if insert is successful else returns false
 	 */
 	public boolean insert(String query, String[] values) {
@@ -98,22 +153,17 @@ public class DbHelper {
 	}
 
 	/**
+	 * Update.
+	 *
+	 * @param table = name of table
+	 * @param columns = String[] for columns
+	 * @param values = values substituted for ? in query specified
+	 * @param whereClause = WHERE condition
+	 * @param whereArgs = arguments if where parameter is in prepared statement format
+	 * @return returns true if update is successful else returns false
 	 * @author ritesh
 	 * 
-	 *         Method to update values to database
-	 * 
-	 * @param table
-	 *            = name of table
-	 * @param columns
-	 *            = String[] for columns
-	 * @param values
-	 *            = values substituted for ? in query specified
-	 * @param whereClause
-	 *            = WHERE condition
-	 * @param whereArgs
-	 *            = arguments if where parameter is in prepared statement format
-	 * 
-	 * @return returns true if update is successful else returns false
+	 * Method to update values to database
 	 */
 
 	public boolean update(String table, String columns[], String[] values,
@@ -131,18 +181,15 @@ public class DbHelper {
 	}
 
 	/**
+	 * Delete.
+	 *
+	 * @param table = name of table
+	 * @param whereClause = WHERE condition
+	 * @param whereArgs = arguments if where parameter is in prepared statement format
+	 * @return returns true if delete is successful else returns false
 	 * @author ritesh
 	 * 
-	 *         Method to delete row(s) from table
-	 * 
-	 * @param table
-	 *            = name of table
-	 * @param whereClause
-	 *            = WHERE condition
-	 * @param whereArgs
-	 *            = arguments if where parameter is in prepared statement format
-	 * 
-	 * @return returns true if delete is successful else returns false
+	 * Method to delete row(s) from table
 	 */
 
 	public boolean delete(String table, String whereClause, String whereArgs[]) {
@@ -151,7 +198,7 @@ public class DbHelper {
 	}
 
 	/**
-	 * Clears complete database
+	 * Clears complete database.
 	 */
 	public void delete() {
 		for (DbModel query : models) {
@@ -159,6 +206,12 @@ public class DbHelper {
 		}
 	}
 
+	/**
+	 * Parses the cursor to list.
+	 *
+	 * @param cursor the cursor
+	 * @return the list
+	 */
 	public List<Object[]> parseCursorToList(Cursor cursor) {
 		List<Object[]> list = new ArrayList<Object[]>();
 		String columns[] = cursor.getColumnNames();
@@ -179,12 +232,11 @@ public class DbHelper {
 	}
 
 	/**
-	 * Selects all columns from table
-	 * 
-	 * @param table
-	 *            = name of table from which records need to be specified
+	 * Selects all columns from table.
+	 *
+	 * @param table = name of table from which records need to be specified
 	 * @return returns List of Object[], each element in List represent row of
-	 *         table in Object[] form
+	 * table in Object[] form
 	 */
 	public List<Object[]> select(String table) {
 		Cursor cursor = this.db.query(table, new String[] { "*" }, null, null,
@@ -197,23 +249,16 @@ public class DbHelper {
 	}
 
 	/**
-	 * Selects records from table
-	 * 
-	 * @param table
-	 *            = name of table
-	 * @param columns
-	 *            = String[] for columns
-	 * @param where
-	 *            = WHERE condition
-	 * @param whereargs
-	 *            = arguments if where parameter is in prepared statement format
-	 * @param groupby
-	 *            = GROUP BY column(s)
-	 * @param having
-	 *            = HAVING condition
-	 * @param orderby
-	 *            = ORDER BY column witrh asc, desc specification
-	 * @return
+	 * Selects records from table.
+	 *
+	 * @param table = name of table
+	 * @param columns = String[] for columns
+	 * @param where = WHERE condition
+	 * @param whereargs = arguments if where parameter is in prepared statement format
+	 * @param groupby = GROUP BY column(s)
+	 * @param having = HAVING condition
+	 * @param orderby = ORDER BY column witrh asc, desc specification
+	 * @return the list
 	 */
 	public List<Object[]> select(String table, String columns[], String where,
 			String whereargs[], String groupby, String having, String orderby) {
@@ -227,6 +272,12 @@ public class DbHelper {
 		return list;
 	}
 
+	/**
+	 * Gets the max id.
+	 *
+	 * @param tableName the table name
+	 * @return the max id
+	 */
 	public int getMaxID(String tableName) {
 		String query = "SELECT MAX(_id) FROM " + tableName;
 		Cursor cursor = db.rawQuery(query, null);
@@ -241,6 +292,12 @@ public class DbHelper {
 		return id;
 	}
 
+	/**
+	 * Gets the count.
+	 *
+	 * @param tableName the table name
+	 * @return the count
+	 */
 	public int getCount(String tableName) {
 		String query = "SELECT count(*) FROM " + tableName;
 		Cursor cursor = db.rawQuery(query, null);
@@ -255,6 +312,12 @@ public class DbHelper {
 		return id;
 	}
 
+	/**
+	 * Checks if is not empty.
+	 *
+	 * @param table the table
+	 * @return true, if is not empty
+	 */
 	public boolean isNotEmpty(String table) {
 		Cursor c = null;
 		try {
@@ -272,23 +335,47 @@ public class DbHelper {
 
 	}
 
+	/**
+	 * Gets the models.
+	 *
+	 * @return the models
+	 */
 	public List<DbModel> getModels() {
 		return models;
 	}
 
-	public void setModels(List<DbModel> models) {
+	/**
+	 * Sets the models.
+	 *
+	 * @param models the new models
+	 */
+	private void setModels(List<DbModel> models) {
 		this.models = models;
 	}
 
+	/**
+	 * The Class OpenHelper.
+	 */
 	private class OpenHelper extends SQLiteOpenHelper {
 
+		/** The Constant TAG. */
 		private static final String TAG = "OpenHelper";
+		
+		/** The sql. */
 		private String sql;
 
+		/**
+		 * Instantiates a new open helper.
+		 *
+		 * @param context the context
+		 */
 		OpenHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 
+		/* (non-Javadoc)
+		 * @see android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
+		 */
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			if (models != null) {
@@ -301,6 +388,9 @@ public class DbHelper {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
+		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.d("upgrading database", DATABASE_NAME);
