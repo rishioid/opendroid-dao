@@ -20,8 +20,10 @@ import android.util.Log;
  */
 public class DbHelper {
 	
+	private DbConfiguration dbConfiguration = null;
+	
 	/** The database name. */
-	private static String DATABASE_NAME;
+	private String DATABASE_NAME;
 	
 	/** The Constant DATABASE_VERSION. */
 	private final static int DATABASE_VERSION = 1;
@@ -30,7 +32,7 @@ public class DbHelper {
 	private static final String TAG = "DbHelper";
 	
 	/** The models. */
-	private static List<DbModel> models;
+	private List<DbModel> models;
 	
 	/** The context. */
 	private Context context;
@@ -45,7 +47,7 @@ public class DbHelper {
 	private static OpenHelper openHelper;
 	
 	/** The database path. */
-	private static String databasePath = null;
+	private String databasePath = null;
 
 	/** The db helper. */
 	private static DbHelper dbHelper = null;
@@ -83,9 +85,9 @@ public class DbHelper {
 	 *
 	 * @param context the context
 	 * @param dbConfiguration the database configuration
-	 * @return the DbHelper instance
+	 * @return the DbHelperdd instance
 	 */
-	public synchronized static DbHelper init(Context context,
+	public synchronized DbHelper init(Context context,
 			DbConfiguration dbConfiguration) {
 		DATABASE_NAME = dbConfiguration.getDatabaseName();
 		models = dbConfiguration.getModels();
