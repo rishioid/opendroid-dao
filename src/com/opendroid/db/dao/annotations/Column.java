@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.opendroid.db.ColumnDataType;
+
 /**
  * author: Rishi Kolvekar
  * Copyright (C) 2013 opendroid-dao
@@ -25,7 +27,7 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.FIELD)
 public @interface Column {
 
-    String name();
+    String name() default "";
 
-    String type();
+    ColumnDataType type();
 }

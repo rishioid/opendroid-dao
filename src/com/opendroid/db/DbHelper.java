@@ -19,46 +19,48 @@ import android.util.Log;
  * 
  */
 public class DbHelper {
-	
-	private DbConfiguration dbConfiguration = null;
-	
+
 	/** The database name. */
-	private String DATABASE_NAME;
-	
+	private static String DATABASE_NAME;
+
 	/** The Constant DATABASE_VERSION. */
 	private final static int DATABASE_VERSION = 1;
-	
+
 	/** The Constant TAG. */
 	private static final String TAG = "DbHelper";
-	
+
 	/** The models. */
-	private List<DbModel> models;
-	
+	private static List<DbModel> models;
+
 	/** The context. */
 	private Context context;
-	
+
 	/** The db. */
 	private SQLiteDatabase db;
-	
+
 	/** The insert stmt. */
 	private SQLiteStatement insertStmt;
-	
+
 	/** The open helper. */
 	private static OpenHelper openHelper;
-	
+
 	/** The database path. */
-	private String databasePath = null;
+	private static String databasePath = null;
 
 	/** The db helper. */
 	private static DbHelper dbHelper = null;
 
+	private static boolean autoCreateTables = false;
+
 	/**
 	 * Instantiates a new db helper.
-	 *
-	 * @param context the context
+	 * 
+	 * @param context
+	 *            the context
 	 */
 	private DbHelper(Context context) {
 		this.context = context;
+
 		if (this.DATABASE_NAME == null || this.models == null) {
 			Log.d(TAG, "Initialized an empty helper.");
 		} else {
@@ -79,33 +81,39 @@ public class DbHelper {
 
 	}
 
-
 	/**
-	 * Inits a new databasehelper instance, need to be done just once while startup of application
-	 *
-	 * @param context the context
-	 * @param dbConfiguration the database configuration
-	 * @return the DbHelperdd instance
+	 * Inits a new databasehelper instance, need to be done just once while
+	 * startup of application
+	 * 
+	 * @param context
+	 *            the context
+	 * @param dbConfiguration
+	 *            the database configuration
 	 */
-	public synchronized DbHelper init(Context context,
-			DbConfiguration dbConfiguration) {
-		DATABASE_NAME = dbConfiguration.getDatabaseName();
+	public synchronized static void init(DbConfiguration dbConfiguration) {
 		models = dbConfiguration.getModels();
 		databasePath = dbConfiguration.getDatabasePath();
-
-		return new DbHelper(context);
+		autoCreateTables = dbConfiguration.isOrm();
+		// return new DbHelper(context);
 	}
 
 	/**
 	 * Gets the single instance of DbHelper.
-	 *
-	 * @param context the context
+	 * 
+	 * @param context
+	 *            the context
 	 * @return single instance of DbHelper
+	 * @throws InstantiationException if this method is called before init method.
 	 */
-	public static DbHelper getInstance(Context context) {
+	public static DbHelper getInstance(Context context) throws InstantiationException {
 
-		if (dbHelper == null) {
-			dbHelper = new DbHelper(context);
+		if (DATABASE_NAME != null) {
+			if (dbHelper == null) {
+				dbHelper = new DbHelper(context);
+			}
+		}
+		else{
+			throw new InstantiationException("OBJECT NOT INITIALIZED : Please initialize DbHelper with init() method first."); 
 		}
 
 		return dbHelper;
@@ -122,12 +130,11 @@ public class DbHelper {
 
 	/**
 	 * Gets the SQLite database instance.
-	 *
+	 * 
 	 * @return the SQLite database instance
 	 */
 	public SQLiteDatabase getSQLiteDatabase() {
-		if(db!=null && !db.isOpen())
-		{
+		if (db != null && !db.isOpen()) {
 			if (databasePath == null) {
 				db = openHelper.getWritableDatabase();
 			} else {
@@ -141,9 +148,11 @@ public class DbHelper {
 
 	/**
 	 * Method to insert values to database.
-	 *
-	 * @param query = string query as per JDBC prepared statement
-	 * @param values = values substituted for ? in query specified
+	 * 
+	 * @param query
+	 *            = string query as per JDBC prepared statement
+	 * @param values
+	 *            = values substituted for ? in query specified
 	 * @return returns true if insert is successful else returns false
 	 */
 	public boolean insert(String query, String[] values) {
@@ -156,16 +165,21 @@ public class DbHelper {
 
 	/**
 	 * Update.
-	 *
-	 * @param table = name of table
-	 * @param columns = String[] for columns
-	 * @param values = values substituted for ? in query specified
-	 * @param whereClause = WHERE condition
-	 * @param whereArgs = arguments if where parameter is in prepared statement format
+	 * 
+	 * @param table
+	 *            = name of table
+	 * @param columns
+	 *            = String[] for columns
+	 * @param values
+	 *            = values substituted for ? in query specified
+	 * @param whereClause
+	 *            = WHERE condition
+	 * @param whereArgs
+	 *            = arguments if where parameter is in prepared statement format
 	 * @return returns true if update is successful else returns false
 	 * @author ritesh
 	 * 
-	 * Method to update values to database
+	 *         Method to update values to database
 	 */
 
 	public boolean update(String table, String columns[], String[] values,
@@ -184,14 +198,17 @@ public class DbHelper {
 
 	/**
 	 * Delete.
-	 *
-	 * @param table = name of table
-	 * @param whereClause = WHERE condition
-	 * @param whereArgs = arguments if where parameter is in prepared statement format
+	 * 
+	 * @param table
+	 *            = name of table
+	 * @param whereClause
+	 *            = WHERE condition
+	 * @param whereArgs
+	 *            = arguments if where parameter is in prepared statement format
 	 * @return returns true if delete is successful else returns false
 	 * @author ritesh
 	 * 
-	 * Method to delete row(s) from table
+	 *         Method to delete row(s) from table
 	 */
 
 	public boolean delete(String table, String whereClause, String whereArgs[]) {
@@ -210,8 +227,9 @@ public class DbHelper {
 
 	/**
 	 * Parses the cursor to list.
-	 *
-	 * @param cursor the cursor
+	 * 
+	 * @param cursor
+	 *            the cursor
 	 * @return the list
 	 */
 	public List<Object[]> parseCursorToList(Cursor cursor) {
@@ -235,10 +253,11 @@ public class DbHelper {
 
 	/**
 	 * Selects all columns from table.
-	 *
-	 * @param table = name of table from which records need to be specified
+	 * 
+	 * @param table
+	 *            = name of table from which records need to be specified
 	 * @return returns List of Object[], each element in List represent row of
-	 * table in Object[] form
+	 *         table in Object[] form
 	 */
 	public List<Object[]> select(String table) {
 		Cursor cursor = this.db.query(table, new String[] { "*" }, null, null,
@@ -252,14 +271,21 @@ public class DbHelper {
 
 	/**
 	 * Selects records from table.
-	 *
-	 * @param table = name of table
-	 * @param columns = String[] for columns
-	 * @param where = WHERE condition
-	 * @param whereargs = arguments if where parameter is in prepared statement format
-	 * @param groupby = GROUP BY column(s)
-	 * @param having = HAVING condition
-	 * @param orderby = ORDER BY column witrh asc, desc specification
+	 * 
+	 * @param table
+	 *            = name of table
+	 * @param columns
+	 *            = String[] for columns
+	 * @param where
+	 *            = WHERE condition
+	 * @param whereargs
+	 *            = arguments if where parameter is in prepared statement format
+	 * @param groupby
+	 *            = GROUP BY column(s)
+	 * @param having
+	 *            = HAVING condition
+	 * @param orderby
+	 *            = ORDER BY column witrh asc, desc specification
 	 * @return the list
 	 */
 	public List<Object[]> select(String table, String columns[], String where,
@@ -276,8 +302,9 @@ public class DbHelper {
 
 	/**
 	 * Gets the max id.
-	 *
-	 * @param tableName the table name
+	 * 
+	 * @param tableName
+	 *            the table name
 	 * @return the max id
 	 */
 	public int getMaxID(String tableName) {
@@ -296,8 +323,9 @@ public class DbHelper {
 
 	/**
 	 * Gets the count.
-	 *
-	 * @param tableName the table name
+	 * 
+	 * @param tableName
+	 *            the table name
 	 * @return the count
 	 */
 	public int getCount(String tableName) {
@@ -316,8 +344,9 @@ public class DbHelper {
 
 	/**
 	 * Checks if is not empty.
-	 *
-	 * @param table the table
+	 * 
+	 * @param table
+	 *            the table
 	 * @return true, if is not empty
 	 */
 	public boolean isNotEmpty(String table) {
@@ -339,7 +368,7 @@ public class DbHelper {
 
 	/**
 	 * Gets the models.
-	 *
+	 * 
 	 * @return the models
 	 */
 	public List<DbModel> getModels() {
@@ -348,8 +377,9 @@ public class DbHelper {
 
 	/**
 	 * Sets the models.
-	 *
-	 * @param models the new models
+	 * 
+	 * @param models
+	 *            the new models
 	 */
 	private void setModels(List<DbModel> models) {
 		this.models = models;
@@ -362,21 +392,26 @@ public class DbHelper {
 
 		/** The Constant TAG. */
 		private static final String TAG = "OpenHelper";
-		
+
 		/** The sql. */
 		private String sql;
 
 		/**
 		 * Instantiates a new open helper.
-		 *
-		 * @param context the context
+		 * 
+		 * @param context
+		 *            the context
 		 */
 		OpenHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 
-		/* (non-Javadoc)
-		 * @see android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.database.sqlite.SQLiteOpenHelper#onCreate(android.database
+		 * .sqlite.SQLiteDatabase)
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase db) {
@@ -390,8 +425,12 @@ public class DbHelper {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database
+		 * .sqlite.SQLiteDatabase, int, int)
 		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
