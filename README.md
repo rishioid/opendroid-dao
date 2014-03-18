@@ -119,7 +119,7 @@ class MyTableDAO extends BaseDAO<MyTableModel>{
 
 }
 ```
-3) Initialise your Database in `Application` class
+3) Initialise your Database in your `Launcher Activity`
 ```java
 	private final void initDatabase(){
 		List<DbModel> models = new ArrayList<DbModel>();
