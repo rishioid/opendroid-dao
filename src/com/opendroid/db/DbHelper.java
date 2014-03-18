@@ -20,7 +20,6 @@ import android.util.Log;
  */
 public class DbHelper {
 	
-	private DbConfiguration dbConfiguration = null;
 	
 	/** The database name. */
 	private String DATABASE_NAME;
@@ -59,29 +58,22 @@ public class DbHelper {
 	 */
 	private DbHelper(Context context) {
 		this(context,null);
-//		this.context = context;
-//		if (DATABASE_NAME == null || models == null) {
-//			Log.d(TAG, "Initialized an empty helper.");
-//		} else {
-//			openHelper = new OpenHelper(this.context);
-//			openHelper.close();
-//			if (db != null && db.isOpen()) {
-//				db.close();
-//				openHelper.close();
-//			}
-//			if (databasePath == null) {
-//				db = openHelper.getWritableDatabase();
-//			} else {
-//				db = SQLiteDatabase.openDatabase(databasePath + DATABASE_NAME,
-//						null, SQLiteDatabase.OPEN_READWRITE);
-//
-//			}
-//		}
-
 	}
 	
 	
+	/**
+	 * Instantiates a new db helper.
+	 *
+	 * @param context the context
+	 * @param dbConfiguration the db configuration
+	 * @author siddhesh
+	 */
 	private DbHelper(Context context,DbConfiguration dbConfiguration){
+		/**
+		 * This constructor was made to remove problem of initialising DATABASE with name and models
+		 * As the previous init() method was not static so it was not able to initialise the DbHelper. 
+		 * 
+		 **/
 		if(dbConfiguration != null){
 			DATABASE_NAME = dbConfiguration.getDatabaseName();
 			models = dbConfiguration.getModels();
@@ -109,37 +101,27 @@ public class DbHelper {
 
 
 	/**
-	 * Inits a new databasehelper instance, need to be done just once while startup of application
-	 *
-	 * @param context the context
-	 * @param dbConfiguration the database configuration
-	 * @return the DbHelperdd instance
-	 */
-//	public static synchronized DbHelper init(Context context,
-//			DbConfiguration dbConfiguration) {
-//		DATABASE_NAME = dbConfiguration.getDatabaseName();
-//		models = dbConfiguration.getModels();
-//		databasePath = dbConfiguration.getDatabasePath();
-//
-//		return new DbHelper(context);
-//	}
-
-	/**
 	 * Gets the single instance of DbHelper.
 	 *
 	 * @param context the context
 	 * @return single instance of DbHelper
 	 */
-	public static DbHelper getInstance(Context context) {
-
+	public static synchronized DbHelper getInstance(Context context) {
 		if (dbHelper == null) {
 			dbHelper = new DbHelper(context,null);
 		}
-
 		return dbHelper;
 	}
 	
-	public static DbHelper init(Context context,DbConfiguration dbConfiguration) {
+	/**
+	 * Inits a new databasehelper instance, need to be done just once while startup of application
+	 *
+	 * @param context the context
+	 * @param dbConfiguration the db configuration
+	 * @return the db helper
+	 * @author siddhesh
+	 */
+	public static synchronized DbHelper init(Context context,DbConfiguration dbConfiguration) {
 		dbHelper = new DbHelper(context,dbConfiguration);
 		return dbHelper;
 	}
