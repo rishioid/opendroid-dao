@@ -38,6 +38,7 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	public BaseDAO(Context context, SQLiteDatabase db) {
 		this.context = context;
 		this.db = db;
+		Log.e("CHECK", "DB IN BASEDAO CON : "+db);
 	}
 
 	/**
@@ -195,7 +196,7 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	 * @see com.opendroid.db.dao.DAO#create(java.lang.Object)
 	 */
 	public void create(T model) throws DAOException {
-
+		Log.e("CHECK", "DB = "+db+" MODEL = "+model);
 		int id = (int) db.insert(getTableName(), "0.0", values(model));
 		if (id != -1) {
 			// TODO: change type of ID field to Long
@@ -260,8 +261,8 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	 * @param fieldName the field name
 	 * @param fieldValue the field value
 	 */
-	public void deleteByField(String fieldName, String fieldValue) {
-		db.delete(getTableName(), " " + fieldName + " = ?",
+	public int deleteByField(String fieldName, String fieldValue) {
+		return db.delete(getTableName(), " " + fieldName + " = ?",
 				new String[] { fieldValue });
 	}
 
@@ -346,6 +347,10 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	 */
 	protected String[] whereArgsForId(int id) {
 		return new String[] { String.valueOf(id) };
+	}
+	
+	protected String[] whereArgs(String val) {
+		return new String[] {val};
 	}
 
 	/**
