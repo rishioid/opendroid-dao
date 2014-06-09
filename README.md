@@ -1,9 +1,15 @@
-opendroid-dao
+Opendroid DAO
 =============
 
-DAO library for android
+A simple ORM library for android, that helps you to implement DAO pattern for your data access in your android project.
 
-1) Create Your Models for each table which `implements DbModel`
+STEP 1:
+Create Your Models for each table which implements `DbModel` interface
+
+Implementing `DbModel` needs overriding four methods `getId()`, `setId()`, `getTableName()` and `getCreateStatement()`. Getter and setter related to id are for primary key purpose, `getTableName()` should return table name for respective binding in form of `String`, which can either reside in your current model class or any other `String` variable or constant within your project.
+
+Following code illustrates a simple example to create a model.
+
 ```java
 class MyTableModel implements DbModel{
     private int id;
