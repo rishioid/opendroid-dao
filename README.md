@@ -12,6 +12,19 @@ Following code illustrates a simple example to create a model.
 
 ```java
 class MyTableModel implements DbModel{
+
+public static final String TABLE_NAME = "mytable";
+
+public static final String ID = "_id";
+	public static final String USER_IMAGE = "user_image";
+	public static final String USER_NAME = "user_name";
+	public static final String POST_TITLE = "post_title";
+
+public static final String CREATE_TABLE = TABLE_NAME + " (" 
+			+ ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ USER_IMAGE + " TEXT, "
+			+ USER_NAME + " TEXT, "
+			+ POST_TITLE + " TEXT);";
     private int id;
 	private String userImage;
 	private String userName;
@@ -53,31 +66,22 @@ class MyTableModel implements DbModel{
 
 	@Override
 	public String getTableName() {
-		return MyTableDAO.TABLE_NAME;
+		return TABLE_NAME;
 	}
 
 	@Override
 	public String getCreateStatement() {
-		return MyTableDAO.CREATE_TABLE;
+		return CREATE_TABLE;
 	}
 
 }
 ```
-2) Create your `DAO` classes for corresponding `Models`
+STEP 2:
+Create your `DAO` classes for corresponding `Model`(s)
 
 ```java
 class MyTableDAO extends BaseDAO<MyTableModel>{
-	public static final String ID = "_id";
-	public static final String USER_IMAGE = "user_image";
-	public static final String USER_NAME = "user_name";
-	public static final String POST_TITLE = "post_title";
-	public static final String TABLE_NAME = "postDB";
-	public static final String CREATE_TABLE = TABLE_NAME + " (" 
-			+ ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ USER_IMAGE + " TEXT, "
-			+ USER_NAME + " TEXT, "
-			+ POST_TITLE + " TEXT);";
-
+	
 	public MyTableDAO(Context context, SQLiteDatabase db) {
 		super(context, db);
 	}
@@ -101,31 +105,32 @@ class MyTableDAO extends BaseDAO<MyTableModel>{
 
 	@Override
 	public String getTableName() {
-		return TABLE_NAME;
+		return MyTableModel.TABLE_NAME;
 	}
 
 	@Override
 	public Datum fromCursor(Cursor c) {
 		MyTableModel model = new MyTableModel();
-		model.setId(CursorUtils.extractIntOrNull(c, WallPostDAO.ID));
-		model.setUserImage(CursorUtils.extractStringOrNull(c, WallPostDAO.USER_IMAGE));
-		model.setUserName(CursorUtils.extractStringOrNull(c, WallPostDAO.USER_NAME));
-		model.setPostTitle(CursorUtils.extractStringOrNull(c, WallPostDAO.POST_TITLE));
+		model.setId(CursorUtils.extractIntOrNull(c, MyTableModel.ID));
+		model.setUserImage(CursorUtils.extractStringOrNull(c, MyTableModel.USER_IMAGE));
+		model.setUserName(CursorUtils.extractStringOrNull(c, MyTableModel.USER_NAME));
+		model.setPostTitle(CursorUtils.extractStringOrNull(c, MyTableModel.POST_TITLE));
 		return model;
 	}
 
 	@Override
 	public ContentValues values(Datum t) {
 		ContentValues values = new ContentValues();
-		values.put(USER_IMAGE, t.getUserImage());
-		values.put(USER_NAME, t.getUserName());
-		values.put(POST_TITLE, t.getPostTitle());
+		values.put(MyTableModel.USER_IMAGE, t.getUserImage());
+		values.put(MyTableModel.USER_NAME, t.getUserName());
+		values.put(MyTableModel.POST_TITLE, t.getPostTitle());
 		return values;
 	}
 
 }
 ```
-3) Initialise your Database in your `Launcher Activity`
+STEP 3:
+Initialize your Database in your `Launcher Activity`
 ```java
 	private final void initDatabase(){
 		List<DbModel> models = new ArrayList<DbModel>();
@@ -134,7 +139,7 @@ class MyTableDAO extends BaseDAO<MyTableModel>{
 		DbConfiguration.Builder config = new Builder()
 		.setDatabaseName("MyDb.db")
 		.setModels(models);
-		DbHelper.init(this, config.build());//returns instance of DbHelper which is Singleton
+		DbHelper.init(this, config.build()); //returns a singleton instance of DbHelper 
 	}
 ```
 
