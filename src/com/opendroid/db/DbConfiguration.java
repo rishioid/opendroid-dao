@@ -4,21 +4,15 @@ import java.util.List;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class DbConfiguration.
+ * Configuration class
  */
 public class DbConfiguration {
 	
 	static DbConfiguration dbConf;
-
-	/** The table name. */
 	final private String databaseName;
-	
 	final private String databasePath;
-
-	/** The models. */
 	final private List<DbModel> models;
-	
-	
+
 	public String getDatabaseName() {
 		return databaseName;
 	}
@@ -26,7 +20,6 @@ public class DbConfiguration {
 	public String getDatabasePath() {
 		return databasePath;
 	}
-
 
 	public List<DbModel> getModels() {
 		return models;

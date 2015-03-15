@@ -19,18 +19,5 @@ public interface DbModel {
 	 * @param id the new id
 	 */
 	public void setId(int id);
-	
-	/**
-	 * returns table name to which the model corresponds.
-	 *
-	 * @return the table name
-	 */
-	public String getTableName();
 
-	/**
-	 * Gets the creates the statement for table.
-	 *
-	 * @return the creates the statement
-	 */
-	public String getCreateStatement();
 }

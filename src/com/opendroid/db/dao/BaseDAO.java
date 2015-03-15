@@ -20,13 +20,8 @@ import com.opendroid.db.StringUtils;
  */
 public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 
-	/** The Constant TAG. */
 	private static final String TAG = "BaseDAO";
-	
-	/** The db. */
 	protected final SQLiteDatabase db;
-	
-	/** The context. */
 	protected final Context context;
 
 	/**
@@ -85,7 +80,7 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	 * @return the t
 	 * @throws DAOException the dAO exception
 	 */
-	public T findByPrimaryKey(int id) throws DAOException {
+	public T findById(int id) throws DAOException {
 		Cursor c = null;
 		T t = null;
 
@@ -141,26 +136,26 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	 *
 	 * @return the list
 	 */
-	public List<T> selectAll() {
-		Cursor c = null;
-		List<T> result = null;
-		try {
-			c = db.rawQuery("select * from " + getTableName(), null);
-			result = new ArrayList<T>();
-			if (c.moveToFirst()) {
-				do {
-					Log.d(TAG, "COLUMN : " + c.getString(0)
-							+ " 1: " + c.getString(1) + " 2: " + c.getString(2));
-					result.add(fromCursor(c));
-				} while (c.moveToNext());
-			}
-		} finally {
-			if (c != null) {
-				c.close();
-			}
-		}
-		return result;
-	}
+//	public List<T> findAll() {
+//		Cursor c = null;
+//		List<T> result = null;
+//		try {
+//			c = db.rawQuery("select * from " + getTableName(), null);
+//			result = new ArrayList<T>();
+//			if (c.moveToFirst()) {
+//				do {
+//					Log.d(TAG, "COLUMN : " + c.getString(0)
+//							+ " 1: " + c.getString(1) + " 2: " + c.getString(2));
+//					result.add(fromCursor(c));
+//				} while (c.moveToNext());
+//			}
+//		} finally {
+//			if (c != null) {
+//				c.close();
+//			}
+//		}
+//		return result;
+//	}
 
 	/**
 	 * Find all by field.
@@ -245,6 +240,11 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	public void delete(int id) throws DAOException {
 		db.delete(getTableName(), " " + ID + " = ?", whereArgsForId(id));
 	}
+
+    @Override
+    public void delete(T model) throws DAOException {
+        db.delete(getTableName(), " " + ID + " = ?", whereArgsForId(model.getId()));
+    }
 
 	/**
 	 * Delete all.
@@ -348,41 +348,5 @@ public abstract class BaseDAO<T extends DbModel> implements DAO<T> {
 	protected String[] whereArgsForId(int id) {
 		return new String[] { String.valueOf(id) };
 	}
-	
-	protected String[] whereArgs(String val) {
-		return new String[] {val};
-	}
 
-	/**
-	 * Convert <code>{1, 2, 3}</code> to <code>"1,2,3"</code>.
-	 *
-	 * @param ids the ids
-	 * @return the string
-	 */
-	protected String idArrayToString(int[] ids) {
-		StringBuilder sqlFragment = new StringBuilder();
-		for (int i = 0; i < ids.length; i++) {
-			sqlFragment.append(ids[i]);
-			if (i < ids.length - 1) {
-				sqlFragment.append(',');
-			}
-		}
-		return sqlFragment.toString();
-	}
-
-	/**
-	 * Convert all cursor lines to a list of model objects.
-	 *
-	 * @param cursor the cursor
-	 * @return the list
-	 */
-	protected List<T> allFromCursor(Cursor cursor) {
-		ArrayList<T> result = new ArrayList<T>();
-		if (cursor.moveToFirst()) {
-			do {
-				result.add(fromCursor(cursor));
-			} while (cursor.moveToNext());
-		}
-		return result;
-	}
 }
